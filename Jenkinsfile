@@ -5,10 +5,12 @@ pipeline {
     }
     environment {
         IMAGE_NAME = "localhost:5001/node-pipeline-poc"
+        SONAR_HOST_URL = "http://localhost:9000"
+        SONAR_AUTH_TOKEN = credentials('sonar-token') 
+        // 'sonar-token' must be a Jenkins secret text credential containing your SonarQube token
     }
     tools {
         nodejs 'Node22'
-        sonarRunner 'SonarScanner'
     }
     stages {
         stage('Checkout') {
@@ -16,6 +18,7 @@ pipeline {
                 checkout scm
             }
         }
+
         stage('Install & Lint & Test') {
             steps {
                 sh 'npm install'
@@ -28,11 +31,11 @@ pipeline {
             steps {
                 withSonarQubeEnv('My SonarQube Server') {
                     sh """
-                    sonar-scanner \
-                        -Dsonar.projectKey=node-pipeline-poc \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
+                    docker run --rm \
+                        -e SONAR_HOST_URL=${SONAR_HOST_URL} \
+                        -e SONAR_LOGIN=${SONAR_AUTH_TOKEN} \
+                        -v $(pwd):/usr/src \
+                        sonarsource/sonar-scanner-cli
                     """
                 }
             }
@@ -43,11 +46,13 @@ pipeline {
                 sh 'docker build -t ${IMAGE_NAME}:latest .'
             }
         }
+
         stage('Push to Local Registry') {
             steps {
                 sh 'docker push ${IMAGE_NAME}:latest'
             }
         }
+
         stage('Deploy Locally') {
             when { expression { params.DEPLOY } }
             steps {
