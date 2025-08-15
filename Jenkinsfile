@@ -29,17 +29,19 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('My SonarQube Server') {
+                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_AUTH_TOKEN')]) {
                     sh '''
-                    docker run --rm \
-                        -e SONAR_HOST_URL=$SONAR_HOST_URL \
-                        -e SONAR_LOGIN=$SONAR_AUTH_TOKEN \
-                        -v $(pwd):/usr/src \
-                        sonarsource/sonar-scanner-cli
+                        docker run --rm \
+                            --add-host=host.docker.internal:host-gateway \
+                            -e SONAR_HOST_URL=http://host.docker.internal:9000 \
+                            -e SONAR_LOGIN=$SONAR_AUTH_TOKEN \
+                            -v $(pwd):/usr/src \
+                            sonarsource/sonar-scanner-cli
                     '''
                 }
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
