@@ -3,6 +3,9 @@ pipeline {
     environment {
         IMAGE_NAME = "localhost:5000/node-pipeline-poc"
     }
+    tools {
+        nodejs 'Node22' 
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -11,7 +14,9 @@ pipeline {
         }
         stage('Install & Lint & Test') {
             steps {
-                sh 'docker run --rm -v $PWD:/app -w /app node:22-alpine sh -c "npm install && npm run lint && npm test"'
+               sh 'npm install'
+                sh 'npm run lint'
+                sh 'npm test'
             }
         }
         stage('Build Docker Image') {
