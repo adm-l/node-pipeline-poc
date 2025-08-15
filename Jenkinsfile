@@ -6,7 +6,7 @@ pipeline {
     environment {
         IMAGE_NAME = "localhost:5001/node-pipeline-poc"
         SONAR_HOST_URL = "http://localhost:9000"
-        SONAR_AUTH_TOKEN = credentials('SONAR-TOKEN') 
+        SONAR_AUTH_TOKEN = credentials('SONAR_TOKEN') 
         // Make sure 'SONAR-TOKEN' matches your Jenkins Secret Text credential ID exactly
     }
     tools {
