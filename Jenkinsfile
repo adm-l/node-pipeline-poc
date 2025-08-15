@@ -11,9 +11,7 @@ pipeline {
         }
         stage('Install & Lint & Test') {
             steps {
-                sh 'npm install'
-                sh 'npm run lint'
-                sh 'npm test'
+                sh 'docker run --rm -v $PWD:/app -w /app node:22-alpine sh -c "npm install && npm run lint && npm test"'
             }
         }
         stage('Build Docker Image') {
