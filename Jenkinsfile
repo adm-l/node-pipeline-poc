@@ -22,20 +22,21 @@ pipeline {
                 sh 'npm test'
             }
         }
+        
         stage('SonarQube Analysis') {
-            environment {
-                SONAR_TOKEN = credentials('SONAR_KEY')
-            }
             steps {
-                sh '''
-                docker run --rm \
-                  -e SONAR_HOST_URL="http://host.docker.internal:9000" \
-                  -e SONAR_LOGIN="$SONAR_TOKEN" \
-                  -v $PWD:/usr/src \
-                  sonarsource/sonar-scanner-cli
-                '''
+                withCredentials([string(credentialsId: 'SONAR_KEY', variable: 'SONAR_TOKEN')]) {
+                    sh """
+                        docker run --rm \
+                        -e SONAR_HOST_URL="http://host.docker.internal:9000" \
+                        -e SONAR_LOGIN="${SONAR_TOKEN}" \
+                        -v $PWD:/usr/src \
+                        sonarsource/sonar-scanner-cli
+                    """
+                }
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
