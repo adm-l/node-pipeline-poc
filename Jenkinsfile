@@ -29,8 +29,15 @@ pipeline {
                 sh 'docker push ${IMAGE_NAME}:latest'
             }
         }
+        // stage('Deploy Locally') {
+        //     steps {
+        //         sh 'docker rm -f node-poc || true'
+        //         sh 'docker run -d --name node-poc -p 3000:3000 ${IMAGE_NAME}:latest'
+        //     }
+        // }
         stage('Deploy Locally') {
             steps {
+                input message: 'Do you want to deploy this build?', ok: 'Deploy'
                 sh 'docker rm -f node-poc || true'
                 sh 'docker run -d --name node-poc -p 3000:3000 ${IMAGE_NAME}:latest'
             }
