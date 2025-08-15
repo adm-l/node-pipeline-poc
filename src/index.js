@@ -1,6 +1,12 @@
 const express = require('express');
 const app = express();
 
-app.get('/health', (_, res) => res.json({ status: 'ok' }));
+// Route for root URL
+app.get('/', (req, res) => {
+    res.send('hi bharat');
+});
 
-app.listen(3000, () => console.log('App running on port 3000'));
+// Optional: keep /health for pipeline tests
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+app.listen(5001, () => console.log('App running on port 5001'));
