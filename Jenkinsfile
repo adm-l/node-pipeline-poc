@@ -23,13 +23,19 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
+            environment {
+                SONAR_TOKEN = credentials('SONAR_TOKEN')
+            }
             steps {
-                withSonarQubeEnv('SonarQube Server') {
-                    sh 'npx sonarqube-scanner -Dsonar.host.url=http://host.docker.internal:9000'
-                }
+                sh '''
+                docker run --rm \
+                  -e SONAR_HOST_URL="http://host.docker.internal:9000" \
+                  -e SONAR_LOGIN="$SONAR_TOKEN" \
+                  -v $PWD:/usr/src \
+                  sonarsource/sonar-scanner-cli
+                '''
             }
         }
-
 
         stage('Build Docker Image') {
             steps {
