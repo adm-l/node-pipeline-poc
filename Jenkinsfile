@@ -8,6 +8,7 @@ pipeline {
     }
     tools {
         nodejs 'Node22'
+        sonarQubeScanner 'SonarScanner'
     }
     stages {
         stage('Checkout') {
