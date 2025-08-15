@@ -25,11 +25,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube Server') {
-                    // Specify host explicitly if needed
-                    sh 'npx sonarqube-scanner -Dsonar.host.url=http://sonarqube:9000'
+                    sh 'npx sonarqube-scanner -Dsonar.host.url=http://host.docker.internal:9000'
                 }
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
