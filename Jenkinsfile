@@ -22,6 +22,16 @@ pipeline {
                 sh 'npm test'
             }
         }
+        stage('SonarQube Analysis') {
+            environment {
+                SCANNER_HOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+            }
+            steps {
+                withSonarQubeEnv('SonarQube Server') {
+                    sh 'npx sonarqube-scanner'
+                }
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t ${IMAGE_NAME}:latest .'
@@ -33,7 +43,7 @@ pipeline {
             }
         }
         stage('Deploy Locally') {
-            when { expression { params.DEPLOY } }  // deploy only if DEPLOY=true
+            when { expression { params.DEPLOY } }
             steps {
                 sh 'docker rm -f node-poc || true'
                 sh 'docker run -d --name node-poc -p 3000:3000 ${IMAGE_NAME}:latest'
