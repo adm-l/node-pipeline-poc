@@ -6,8 +6,8 @@ pipeline {
     environment {
         IMAGE_NAME = "localhost:5001/node-pipeline-poc"
         SONAR_HOST_URL = "http://localhost:9000"
-        SONAR_AUTH_TOKEN = credentials('sonar-token') 
-        // 'sonar-token' must be a Jenkins secret text credential containing your SonarQube token
+        SONAR_AUTH_TOKEN = credentials('SONAR-TOKEN') 
+        // Make sure 'SONAR-TOKEN' matches your Jenkins Secret Text credential ID exactly
     }
     tools {
         nodejs 'Node22'
@@ -30,13 +30,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('My SonarQube Server') {
-                    sh """
+                    sh '''
                     docker run --rm \
-                        -e SONAR_HOST_URL=${SONAR_HOST_URL} \
-                        -e SONAR_LOGIN=${SONAR_AUTH_TOKEN} \
+                        -e SONAR_HOST_URL=$SONAR_HOST_URL \
+                        -e SONAR_LOGIN=$SONAR_AUTH_TOKEN \
                         -v $(pwd):/usr/src \
                         sonarsource/sonar-scanner-cli
-                    """
+                    '''
                 }
             }
         }
