@@ -32,12 +32,12 @@ pipeline {
         stage('Deploy Locally') {
             steps {
                 sh 'docker rm -f node-poc || true'
-                sh 'docker run -d --name node-poc -p 5001:3000 ${IMAGE_NAME}:latest'
+                sh 'docker run -d --name node-poc -p 3000:3000 ${IMAGE_NAME}:latest'
             }
         }
         stage('Smoke Test') {
             steps {
-                sh 'curl --fail http://localhost:3001/health'
+                sh 'curl --fail http://localhost:5001/health'
             }
         }
     }
