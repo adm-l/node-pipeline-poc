@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        IMAGE_NAME = "localhost:5000/node-pipeline-poc"
+        IMAGE_NAME = "localhost:5001/node-pipeline-poc"
     }
     tools {
         nodejs 'Node22' 
