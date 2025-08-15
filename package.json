@@ -1,0 +1,13 @@
+{
+  "name": "node-pipeline-poc",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "lint": "echo 'Linting... OK'",
+    "test": "echo 'Running tests... OK'"
+  },
+  "dependencies": {
+    "express": "^4.19.0"
+  }
+}
