@@ -5,7 +5,7 @@ pipeline {
     }
     environment {
         IMAGE_NAME = "localhost:5001/node-pipeline-poc"
-        SONAR_HOST_URL = "http://host.docker.internal:9000" 
+        SONAR_HOST_URL = "http://localhost:9000"
         SONAR_AUTH_TOKEN = credentials('SONAR_TOKEN') 
         // Make sure 'SONAR-TOKEN' matches your Jenkins Secret Text credential ID exactly
     }
@@ -29,19 +29,17 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_AUTH_TOKEN')]) {
+                withSonarQubeEnv('My SonarQube Server') {
                     sh '''
-                        docker run --rm \
-                            --add-host=host.docker.internal:host-gateway \
-                            -e SONAR_HOST_URL=http://host.docker.internal:9000 \
-                            -e SONAR_LOGIN=$SONAR_AUTH_TOKEN \
-                            -v $(pwd):/usr/src \
-                            sonarsource/sonar-scanner-cli
+                    docker run --rm \
+                        -e SONAR_HOST_URL=$SONAR_HOST_URL \
+                        -e SONAR_LOGIN=$SONAR_AUTH_TOKEN \
+                        -v $(pwd):/usr/src \
+                        sonarsource/sonar-scanner-cli
                     '''
                 }
             }
         }
-
 
         stage('Build Docker Image') {
             steps {
