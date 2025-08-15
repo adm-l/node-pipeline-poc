@@ -9,4 +9,4 @@ app.get('/', (req, res) => {
 // Optional: keep /health for pipeline tests
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-app.listen(5001, () => console.log('App running on port 5001'));
+app.listen(3000, () => console.log('App running on port 3000'));
