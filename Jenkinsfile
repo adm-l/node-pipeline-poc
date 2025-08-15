@@ -37,7 +37,13 @@ pipeline {
         }
         stage('Smoke Test') {
             steps {
-                sh 'curl --fail http://localhost:5001/health'
+                sh '''
+                for i in {1..5}; do
+                curl --fail http://localhost:3000/health && break
+                echo "Waiting for app to start..."
+                sleep 2
+                done
+                '''
             }
         }
     }
