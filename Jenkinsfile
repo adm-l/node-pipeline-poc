@@ -23,15 +23,14 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-            environment {
-                SCANNER_HOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-            }
             steps {
                 withSonarQubeEnv('SonarQube Server') {
-                    sh 'npx sonarqube-scanner'
+                    // Specify host explicitly if needed
+                    sh 'npx sonarqube-scanner -Dsonar.host.url=http://sonarqube:9000'
                 }
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t ${IMAGE_NAME}:latest .'
