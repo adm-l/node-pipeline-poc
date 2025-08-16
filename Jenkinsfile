@@ -26,20 +26,6 @@ pipeline {
                 sh 'npm test'
             }
         }
-        
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('My SonarQube Server') {
-                    sh '''
-                    docker run --rm \
-                        -e SONAR_HOST_URL=$SONAR_HOST_URL \
-                        -e SONAR_LOGIN=$SONAR_AUTH_TOKEN \
-                        -v $(pwd):/usr/src \
-                        sonarsource/sonar-scanner-cli
-                    '''
-                }
-            }
-        }
 
         stage('Build Docker Image') {
             steps {
