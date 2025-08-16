@@ -5,7 +5,7 @@ pipeline {
     }
     environment {
         IMAGE_NAME = "localhost:5001/node-pipeline-poc"
-        SONAR_HOST_URL = "http://localhost:9000"
+        SONAR_HOST_URL = "http://sonarqube:9000"
         SONAR_AUTH_TOKEN = credentials('SONAR_TOKEN') 
     }
     tools {
