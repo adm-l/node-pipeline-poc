@@ -38,7 +38,6 @@ pipeline {
                 sh 'docker push ${IMAGE_NAME}:latest'
             }
         }
-        
 
         stage('Deploy Locally') {
             when { expression { params.DEPLOY } }
