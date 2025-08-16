@@ -33,7 +33,6 @@ pipeline {
             }
         }
         
-
         stage('Push to Local Registry') {
             steps {
                 sh 'docker push ${IMAGE_NAME}:latest'
