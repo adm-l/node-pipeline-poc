@@ -7,7 +7,6 @@ pipeline {
         IMAGE_NAME = "localhost:5001/node-pipeline-poc"
         SONAR_HOST_URL = "http://localhost:9000"
         SONAR_AUTH_TOKEN = credentials('SONAR_TOKEN') 
-        // Make sure 'SONAR-TOKEN' matches your Jenkins Secret Text credential ID exactly
     }
     tools {
         nodejs 'Node22'
@@ -23,7 +22,31 @@ pipeline {
             steps {
                 sh 'npm install'
                 sh 'npm run lint'
-                sh 'npm test'
+                // Generate Jest coverage report for Sonar
+                sh 'npm test -- --coverage'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('MySonarServer') {
+                    sh """
+                        sonar-scanner \
+                          -Dsonar.projectKey=node-pipeline-poc \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=${SONAR_HOST_URL} \
+                          -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                    """
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
