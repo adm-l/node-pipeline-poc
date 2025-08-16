@@ -32,6 +32,7 @@ pipeline {
                 sh 'docker build -t ${IMAGE_NAME}:latest .'
             }
         }
+        
 
         stage('Push to Local Registry') {
             steps {
