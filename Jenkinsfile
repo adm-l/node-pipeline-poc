@@ -1,7 +1,7 @@
 pipeline {
     agent any
     parameters {
-        booleanParam(name: 'DEPLOY', defaultValue: false, description: 'Deploy this build?')
+        booleanParam(name: 'DEPLOY', defaultValue: false, description: 'Enable manual deployment?')
     }
     environment {
         IMAGE_NAME = "localhost:5001/node-pipeline-poc"
@@ -18,11 +18,10 @@ pipeline {
             }
         }
 
-        stage('Install & Lint & Test') {
+        stage('Install, Lint & Test') {
             steps {
                 sh 'npm install'
                 sh 'npm run lint'
-                // Generate Jest coverage report for Sonar
                 sh 'npm test -- --coverage'
             }
         }
@@ -64,18 +63,37 @@ pipeline {
         }
 
         stage('Deploy Locally') {
-            when { expression { params.DEPLOY } }
+            when { expression { return params.DEPLOY } }
             steps {
-                sh 'docker rm -f node-poc || true'
-                sh 'docker run -d --name node-poc -p 3000:3000 ${IMAGE_NAME}:latest'
-                sh '''
-                for i in {1..5}; do
-                  curl --fail http://localhost:3000/health && break
-                  echo "Waiting for app to start..."
-                  sleep 2
-                done
-                '''
+                input message: "Do you want to deploy this build now?", ok: "Deploy Now"
+                script {
+                    echo "Starting deployment..."
+                    sh 'docker rm -f node-poc || true'
+                    sh 'docker run -d --name node-poc -p 3000:3000 ${IMAGE_NAME}:latest'
+
+                    // Wait for the app to be healthy
+                    def retries = 10
+                    def wait = 3
+                    for (int i = 0; i < retries; i++) {
+                        try {
+                            sh "curl --fail http://localhost:3000/health"
+                            echo "Application is up and running!"
+                            break
+                        } catch (Exception e) {
+                            echo "Waiting for app to start... (${i+1}/${retries})"
+                            sleep(wait)
+                        }
+                    }
+                }
             }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
