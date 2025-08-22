@@ -2,7 +2,7 @@ pipeline {
     agent any
     parameters {
         booleanParam(name: 'DEPLOY', defaultValue: false, description: 'Deploy this build?')
-    }
+    } 
     environment {
         IMAGE_NAME = "localhost:5001/node-pipeline-poc"
         SONAR_HOST_URL = "http://sonarqube:9000"
